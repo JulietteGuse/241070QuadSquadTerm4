@@ -3,7 +3,7 @@ const options = {
   headers: {
     accept: 'application/json',
     Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhNWRiYmRjMzFjM2M2MDgwMzlhMTI5OTQwN2EwMDIyZSIsIm5iZiI6MTcyOTA4MDc4MC42MTE5MzEsInN1YiI6IjY3MDNkYjg0MTc0YTFkNTc3Mzc5NWUzMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cD8EeJn5B_vExqSjpWULT2bfVKFw55ipTDQ_4UTbFJc'
-}
+  }
 };
 
 // Function to fetch movie details (director, cast, and trailer) using movie ID
@@ -12,18 +12,20 @@ const fetchMovieDetails = async (movieId) => {
     const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits,videos`, options);
     const data = await response.json();
 
-    // Extract director, cast, and trailer details
+    // Extract director, cast, trailer, and release date details
     const director = data.credits.crew.find(person => person.job === 'Director')?.name || 'Unknown';
     const cast = data.credits.cast.slice(0, 5).map(actor => actor.name).join(', ');
     const trailer = data.videos.results.find(video => video.type === 'Trailer')?.key || 'No Trailer';
 
     return {
+      id: movieId,  // Include movie ID
       title: data.title,
       director: director,
       cast: cast,
       overview: data.overview,
       rating: data.vote_average,
-      trailer: `https://www.youtube.com/watch?v=${trailer}`
+      trailer: `https://www.youtube.com/watch?v=${trailer}`,
+      release_date: data.release_date || 'Unknown' // Add release date
     };
   } catch (error) {
     console.error(`Error fetching details for movie ID ${movieId}:`, error);
@@ -62,16 +64,13 @@ const fetchTopRatedMovies = async () => {
 fetchUpcomingMovies();
 fetchTopRatedMovies();
 
-
-
-
-//Genres
+// Genres
 const optionsGenre = {
   method: 'GET',
   headers: {
     accept: 'application/json',
     Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhNWRiYmRjMzFjM2M2MDgwMzlhMTI5OTQwN2EwMDIyZSIsIm5iZiI6MTcyOTA4MDc4MC42MTE5MzEsInN1YiI6IjY3MDNkYjg0MTc0YTFkNTc3Mzc5NWUzMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cD8EeJn5B_vExqSjpWULT2bfVKFw55ipTDQ_4UTbFJc'
-}
+  }
 };
 
 // Function to fetch movie details (director, cast, and trailer) using movie ID
@@ -80,18 +79,20 @@ const fetchMovieDetailsGenre = async (movieId) => {
     const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits,videos`, optionsGenre);
     const data = await response.json();
 
-    // Extract director, cast, and trailer details
+    // Extract director, cast, trailer, and release date details
     const director = data.credits.crew.find(person => person.job === 'Director')?.name || 'Unknown';
     const cast = data.credits.cast.slice(0, 5).map(actor => actor.name).join(', ');
     const trailer = data.videos.results.find(video => video.type === 'Trailer')?.key || 'No Trailer';
 
     return {
+      id: movieId,
       title: data.title,
       director: director,
       cast: cast,
       overview: data.overview,
       rating: data.vote_average,
-      trailer: `https://www.youtube.com/watch?v=${trailer}`
+      trailer: `https://www.youtube.com/watch?v=${trailer}`,
+      release_date: data.release_date || 'Unknown' // Add release date
     };
   } catch (error) {
     console.error(`Error fetching details for movie ID ${movieId}:`, error);
@@ -128,12 +129,7 @@ const genres = [
 // Fetch movies for each genre
 genres.forEach(genre => fetchMoviesByGenre(genre.id, genre.name));
 
-
-
-
-
 // Categories
-
 const optionsCategory = {
   method: 'GET',
   headers: {
@@ -148,24 +144,27 @@ const fetchMovieDetailsCategory = async (movieId) => {
     const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits,videos`, optionsCategory);
     const data = await response.json();
 
-    // Extract director, cast, and trailer details
+    // Extract director, cast, trailer, and release date details
     const director = data.credits.crew.find(person => person.job === 'Director')?.name || 'Unknown';
     const cast = data.credits.cast.slice(0, 5).map(actor => actor.name).join(', ');
     const trailer = data.videos.results.find(video => video.type === 'Trailer')?.key || 'No Trailer';
 
     return {
+      id: movieId,
       title: data.title,
       director: director,
       cast: cast,
       overview: data.overview,
       rating: data.vote_average,
-      trailer: `https://www.youtube.com/watch?v=${trailer}`
+      trailer: `https://www.youtube.com/watch?v=${trailer}`,
+      release_date: data.release_date || 'Unknown' // Add release date
     };
   } catch (error) {
     console.error(`Error fetching details for movie ID ${movieId}:`, error);
     return null;
   }
 };
+
 
 // Function to fetch movies by category and their details
 const fetchMoviesByCategory = async (url, categoryName) => {
