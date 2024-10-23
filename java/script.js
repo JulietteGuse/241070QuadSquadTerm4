@@ -1,16 +1,13 @@
-// Define common options for fetch requests
 const options = {
   method: 'GET',
   headers: {
     accept: 'application/json',
-    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhNWRiYmRjMzFjM2M2MDgwMzlhMTI5OTQwN2EwMDIyZSIsIm5iZiI6MTcyOTA4MDc4MC42MTE5MzEsInN1YiI6IjY3MDNkYjg0MTc0YTFkNTc3Mzc5NWUzMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cD8EeJn5B_vExqSjpWULT2bfVKFw55ipTDQ_4UTbFJc'
+    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1NjZkOTE4Njk3MTg3MmZhMzNkMTJiMTgxNzJlYWVmOCIsIm5iZiI6MTcyOTUxNTMzMi42MTEwMTIsInN1YiI6IjY3MDNkYjg0MTc0YTFkNTc3Mzc5NWUzMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.z-z8fHqgPli4b3T3B5x5vGXAE4VP9akK1OEStlDbp4I'
   }
 };
 
-// Base URL for posters from TMDb
 const posterBaseUrl = 'https://image.tmdb.org/t/p/w500';
 
-// Function to fetch movie details (director, cast, trailer, and poster) using movie ID
 const fetchMovieDetails = async (movieId) => {
   try {
     const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits,videos`, options);
@@ -19,7 +16,6 @@ const fetchMovieDetails = async (movieId) => {
     }
     const data = await response.json();
 
-    // Extract director, cast, trailer, poster, and release date details
     const director = data.credits.crew.find(person => person.job === 'Director')?.name || 'Unknown';
     const cast = data.credits.cast.slice(0, 5).map(actor => actor.name).join(', ');
     const trailer = data.videos.results.find(video => video.type === 'Trailer')?.key || 'No Trailer';
@@ -32,17 +28,16 @@ const fetchMovieDetails = async (movieId) => {
       cast,
       overview: data.overview,
       rating: data.vote_average,
-      poster: posterUrl,  // Poster URL
+      poster: posterUrl,
       trailer: `https://www.youtube.com/watch?v=${trailer}`,
       release_date: data.release_date || 'Unknown'
     };
   } catch (error) {
     console.error(`Error fetching details for movie ID ${movieId}:`, error);
-    return null; // Return null in case of error to avoid breaking Promise.all
+    return null; 
   }
 };
 
-// Function to fetch a list of movies and their details by URL and category
 const fetchMovies = async (url, category) => {
   try {
     const response = await fetch(url, options);
@@ -61,50 +56,48 @@ const fetchMovies = async (url, category) => {
   }
 };
 
-// Fetch upcoming movies
 const fetchUpcomingMovies = async () => {
   const url = 'https://api.themoviedb.org/3/movie/upcoming?language=en-US&page=1';
   await fetchMovies(url, 'Upcoming');
 };
 
-// Fetch top-rated movies
 const fetchTopRatedMovies = async () => {
   const url = 'https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1';
   await fetchMovies(url, 'Top-Rated');
 };
 
-// Genres array
+// Updated genres array with additional genres: Drama, Fantasy, Horror, Sci-Fi, Thriller
 const genres = [
   { id: 28, name: 'Action' },
   { id: 12, name: 'Adventure' },
   { id: 16, name: 'Animation' },
   { id: 99, name: 'Biography (Documentary)' },
   { id: 80, name: 'Crime' },
+  { id: 18, name: 'Drama' },       // Drama
+  { id: 14, name: 'Fantasy' },     // Fantasy
+  { id: 27, name: 'Horror' },      // Horror
+  { id: 878, name: 'Sci-Fi' },     // Sci-Fi
+  { id: 53, name: 'Thriller' },    // Thriller
   { id: 99, name: 'Documentary' }
 ];
 
-// Function to fetch movies by genre
 const fetchMoviesByGenre = async (genreId, genreName) => {
   const url = `https://api.themoviedb.org/3/discover/movie?with_genres=${genreId}&language=en-US&page=1`;
   await fetchMovies(url, genreName);
 };
 
-// Fetch movies for each genre
 genres.forEach(genre => fetchMoviesByGenre(genre.id, genre.name));
 
-// Fetch trending movies
 const fetchTrendingMovies = async () => {
   const url = 'https://api.themoviedb.org/3/trending/movie/week?language=en-US';
   await fetchMovies(url, 'Trending Now');
 };
 
-// Fetch popular movies
 const fetchPopularMovies = async () => {
   const url = 'https://api.themoviedb.org/3/movie/popular?language=en-US';
   await fetchMovies(url, 'Popular');
 };
 
-// Fetch premiere movies (now playing)
 const fetchPremiereMovies = async () => {
   const url = 'https://api.themoviedb.org/3/movie/now_playing?language=en-US';
   await fetchMovies(url, 'Premiere');
@@ -116,6 +109,7 @@ fetchTopRatedMovies();
 fetchTrendingMovies();
 fetchPopularMovies();
 fetchPremiereMovies();
+
 
 
 
