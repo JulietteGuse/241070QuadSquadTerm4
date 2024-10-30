@@ -1,5 +1,5 @@
 // Define common options for fetch requests
-const options = {
+const options3 = {
   method: 'GET',
   headers: {
     accept: 'application/json',
@@ -8,10 +8,10 @@ const options = {
 };
 
 // Base URL for posters from TMDb
-const posterBaseUrl = 'https://image.tmdb.org/t/p/w500';
+const posterBaseUrl2 = 'https://image.tmdb.org/t/p/w500';
 
 // Function to fetch movie details (director, cast, trailer, and poster) using movie ID
-const fetchMovieDetails = async (movieId) => {
+const fetchMovieDetails2 = async (movieId) => {
   try {
     const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits,videos`, options);
     if (!response.ok) {
@@ -116,6 +116,69 @@ fetchTopRatedMovies();
 fetchTrendingMovies();
 fetchPopularMovies();
 fetchPremiereMovies();
+
+
+
+const displayMovieCards = (movies) => {
+  const movieContainer = document.getElementById('movieContainer');
+  movieContainer.innerHTML = '';
+
+  movies.forEach(movie => {
+    const movieCard = document.createElement('div');
+    movieCard.classList.add('movie-card');
+    
+    movieCard.innerHTML = `
+      <img src="${movie.poster}" alt="${movie.title}">
+      <h3>${movie.title}</h3>
+    `;
+
+    // Save movie ID to localStorage and redirect to individual page on click
+    movieCard.addEventListener('click', () => {
+      localStorage.setItem('selectedMovieId', movie.id);
+      window.location.href = 'html/individual.html'; // Redirect to individual page
+    });
+
+    movieContainer.appendChild(movieCard);
+  });
+};
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const movieId = localStorage.getItem('selectedMovieId');
+
+  if (movieId) {
+    const movieDetails = await fetchMovieDetails(movieId);
+
+    if (movieDetails) {
+      document.getElementById('movieTitle').textContent = movieDetails.title;
+      document.getElementById('moviePoster').src = movieDetails.poster;
+      document.getElementById('movieOverview').textContent = movieDetails.overview;
+      document.getElementById('movieDirector').textContent = movieDetails.director;
+      document.getElementById('movieCast').textContent = movieDetails.cast;
+      document.getElementById('movieReleaseDate').textContent = movieDetails.release_date;
+      document.getElementById('movieRating').textContent = movieDetails.rating;
+      
+      // Add trailer link
+      const trailerLink = document.getElementById('movieTrailer');
+      trailerLink.href = movieDetails.trailer;
+      trailerLink.textContent = 'Watch Trailer';
+    } else {
+      console.error('Movie details could not be loaded.');
+    }
+  } else {
+    console.error('No movie ID found in localStorage.');
+  }
+});
+
+
+
+
+
+
+
 
 //andre//
 
